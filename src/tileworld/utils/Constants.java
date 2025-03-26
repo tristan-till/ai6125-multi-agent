@@ -23,12 +23,12 @@ public class Constants {
 	public static String PICK_SCHEME = "B";
 	public static String PATROL_SCHEME = "C";
 	
-	public static String SEARCHING_TILE_STATE = "SearchingTile";
-	public static String PICKING_TILE_STATE = "PickingTile";
-	public static String PATROL_STATE = "planC";
-	public static String FUEL_STATION_FINDING_STATE = "FuelStationFinding";
-	public static String ADDING_FUEL_STATE = "AddingFuel";
-	public static String IDLE_STATE = "idle";
+	public static final String SEARCHING_TILE_STATE = "SearchingTile";
+	public static final String PICKING_TILE_STATE = "PickingTile";
+	public static final String PATROL_STATE = "planC";
+	public static final String FUEL_STATION_FINDING_STATE = "FuelStationFinding";
+	public static final String ADDING_FUEL_STATE = "AddingFuel";
+	public static final String IDLE_STATE = "idle";
 	
 }
 
