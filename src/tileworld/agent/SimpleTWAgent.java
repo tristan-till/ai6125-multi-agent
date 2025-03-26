@@ -29,14 +29,12 @@ public class SimpleTWAgent extends TWAgent{
     }
 
     protected TWThought think() {
-//        getMemory().getClosestObjectInSensorRange(Tile.class);
-        System.out.println("Simple Score: " + this.score);
+    	// getMemory().getClosestObjectInSensorRange(Tile.class);
         return new TWThought(TWAction.MOVE,getRandomDirection());
     }
 
     @Override
     protected void act(TWThought thought) {
-
         //You can do:
         //move(thought.getDirection())
         //pickUpTile(Tile)

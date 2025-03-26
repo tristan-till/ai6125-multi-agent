@@ -1,5 +1,5 @@
 
-package tileworld.agent;
+package archive;
 
 import tileworld.environment.TWEntity;
 
@@ -27,8 +27,7 @@ public class TWAgentPercept{
     final int AFTER = 1;
 
 	private TWEntity o;
-	private double t;  // last sense time
-    private double firstT;   // the first sense time
+	private double t;
 	
 	/**
 	 * @return the t
@@ -36,15 +35,9 @@ public class TWAgentPercept{
 	public double getT() {
 		return t;
 	}
-    public double getFirstT(){
-        return firstT;
-    }
 	/**
 	 * @param t the t to set
 	 */
-    public void setFirstT(double t){
-        this.firstT = t;
-    }
 	public void setT(double t) {
 		this.t = t;
 	}
@@ -66,21 +59,21 @@ public class TWAgentPercept{
 	 * @param t time at which the memory item was created
 	 * @param o the object which was observed
 	 */
-	public TWAgentPercept(TWEntity o, double t, double ft) {
+	public TWAgentPercept(TWEntity o, double t) {
 		super();
 		this.t = t;
 		this.o = o;
-        this.firstT = ft;
 	}
 
-	/**
-	 * true if fact is a newer version of the same memory (ie., see the same
-	 * tile twice)
-	 *
-	 * @param fact
-	 * @return
-	 */
+        /**
+         * true if fact is a newer version of the same memory (ie., see the same
+         * tile twice)
+         *
+         * @param fact
+         * @return
+         */
     public boolean newerFact(Object fact) {
+       
         if(!(fact instanceof TWAgentPercept) ) {return false;}
         TWAgentPercept twf= (TWAgentPercept)fact;
         if(twf.o == this.o){
@@ -99,7 +92,7 @@ public class TWAgentPercept{
      * @return
      */
     public boolean sameObject (Object fact){
-        if(this == fact) return true;
+        if(this == fact ) return true;
         if(!(fact instanceof TWAgentPercept )) return false;
         TWAgentPercept twf= (TWAgentPercept)fact;
         return (this.o == twf.o);

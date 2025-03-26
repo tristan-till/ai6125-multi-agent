@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package tileworld.agent;
+package archive;
 
 import tileworld.environment.TWDirection;
 
@@ -31,11 +31,6 @@ public class TWThought {
     public TWThought(TWAction action, TWDirection direction) {
         this.direction = direction;
         this.action = action;
-    }
-
-    public TWThought(TWAction action){
-        this.action = action;
-        this.direction = TWDirection.Z;
     }
 
     public TWAction getAction() {

@@ -1,4 +1,4 @@
-package tileworld.agent;
+package archive;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -32,13 +32,7 @@ import tileworld.exceptions.CellBlockedException;
  */
 public abstract class TWAgent extends TWEntity implements Steppable {
 
-    public void addTempMessage(String mess){}
-
-    public void addTempAllMessage(String mess){}
-
     protected int score;
-    
-    public Color color = Color.blue;
 
     public int getScore() {
         return score;
@@ -46,11 +40,12 @@ public abstract class TWAgent extends TWEntity implements Steppable {
 
     public TWAgent(int xpos, int ypos, TWEnvironment env, double fuelLevel) {
         super(xpos, ypos, env);
+       
         this.score = 0;
         this.fuelLevel = fuelLevel;
         this.carriedTiles = new ArrayList<TWTile>();
         this.sensor = new TWAgentSensor(this, Parameters.defaultSensorRange);
-        this.memory = new TWAgentWorkingMemory(this, env.schedule, env.getxDimension(), env.getyDimension());
+        this.memory = new TWAgentWorkingMemory_(this, env.schedule, env.getxDimension(), env.getyDimension());
     }
     /**
      * Fuel level, automatically decremented once per move.
@@ -67,7 +62,7 @@ public abstract class TWAgent extends TWEntity implements Steppable {
     /**
      * Memory which stores sensed facts in the form of tuples (see TWAgentMemoryFact)
      */
-    protected TWAgentWorkingMemory memory;
+    protected TWAgentWorkingMemory_ memory;
 
     //THE THREE METHODS YOU SHOULD EXTEND - SENSE, THINK, ACT
     /**
@@ -75,7 +70,6 @@ public abstract class TWAgent extends TWEntity implements Steppable {
      *
      */
     public void sense() {
-        // System.out.println(this.getName() + " sense");
         sensor.sense();
     }
     
@@ -106,7 +100,7 @@ public abstract class TWAgent extends TWEntity implements Steppable {
     @Override
     protected void move(TWDirection d) throws CellBlockedException {
         if (fuelLevel <= 0) {
-        	System.out.println("Agent ran out of fuel, Score: " + this.score);
+        	// System.out.println("Agent ran out of fuel, Score: " + this.score);
             //Bad news, causes runtime exception
             //throw new InsufficientFuelException("Agent ran out of fuel, Score: " + this.score);
         } else {
@@ -169,9 +163,9 @@ public abstract class TWAgent extends TWEntity implements Steppable {
         //assert (this.sameLocation(this.getEnvironment().getFuelingStation()));   	
     	if(this.getEnvironment().inFuelStation(this)) {
     		this.fuelLevel = Parameters.defaultFuelLevel;
-    		System.out.println("Refuel.....");
+    		// System.out.println("Refuel.....");
     	}else {
-    		System.out.println("Agent is not in the same position of fuel station.");
+    		// System.out.println("Agent is not in the same position of fuel station.");
     	}
     }
 
@@ -221,7 +215,6 @@ public abstract class TWAgent extends TWEntity implements Steppable {
      * @return
      */
     public static Portrayal getPortrayal() {
-        // System.out.println("TWAgent getPortrayal");
         //red filled box.
         return new TWAgentPortrayal(Color.blue, Parameters.defaultSensorRange) {
 
@@ -246,7 +239,7 @@ public abstract class TWAgent extends TWEntity implements Steppable {
      * Returns the working memory of this agent
      * @return working memory
      */
-    public TWAgentWorkingMemory getMemory() {
+    public TWAgentWorkingMemory_ getMemory() {
         return memory;
     }
 
@@ -262,7 +255,7 @@ public abstract class TWAgent extends TWEntity implements Steppable {
         //Set location of entity when it's created
         this.getEnvironment().getAgentGrid().set(x, y, this);
     }
-
+    
     /**
      * A name for the agent. Can be used for debugging and right now used for
      * memory portrayal
