@@ -132,7 +132,7 @@ public abstract class TWAgent extends TWEntity implements Steppable {
     	if(this.getEnvironment().canPickupTile(tile, this)) {
 	    	if (carriedTiles.size() < 3){
 	    		carriedTiles.add(tile);
-	    		System.out.println("Pickup...");
+	    		// System.out.println("Pickup...");
 	    		this.getEnvironment().getObjectGrid().set(tile.getX(), tile.getY(), null);
 	    	} else {
 	    		System.out.println("Agent already carries 3 tiles.");
@@ -154,7 +154,7 @@ public abstract class TWAgent extends TWEntity implements Steppable {
     		this.getEnvironment().getObjectGrid().set(hole.getX(), hole.getY(), null);
     		this.score++; // increase individual reward       
     		this.getEnvironment().increaseReward(); // increase the overall reward
-    		System.out.println("Put tile...");
+    		// System.out.println("Put tile...");
     	} else {
     		System.out.println("The put down action is invalid in current situation.");
     	}
@@ -169,7 +169,7 @@ public abstract class TWAgent extends TWEntity implements Steppable {
         //assert (this.sameLocation(this.getEnvironment().getFuelingStation()));   	
     	if(this.getEnvironment().inFuelStation(this)) {
     		this.fuelLevel = Parameters.defaultFuelLevel;
-    		System.out.println("Refuel.....");
+    		// System.out.println("Refuel.....");
     	}else {
     		System.out.println("Agent is not in the same position of fuel station.");
     	}

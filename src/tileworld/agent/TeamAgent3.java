@@ -1,5 +1,7 @@
 package tileworld.agent;
 
+import java.util.Map;
+
 import tileworld.environment.TWDirection;
 import tileworld.environment.TWEnvironment;
 import tileworld.environment.TWHole;
@@ -34,7 +36,7 @@ public class TeamAgent3 extends TWAgent {
     private AstarPathGenerator pathGenerator = new AstarPathGenerator(this.getEnvironment(), this,
 	    this.mapSizeX + this.mapSizeY);
 
-    private AgentMemory memory = new AgentMemory(this.getEnvironment());
+    private AgentMemory memory;
 
     private String tempMessage = "";
     private String tempAllMessage = "";
@@ -42,10 +44,17 @@ public class TeamAgent3 extends TWAgent {
     // private List<AgentTile> candidateTiles = new ArrayList<AgentTile>();
     private AgentTile closestTile = new AgentTile(-1, -1);
     private AgentTile closestHole = new AgentTile(-1, -1);
+    
+    private RefuelScheduler refuelScheduler;
+    private int earlyRequestRefuelTimer = 0;
+    private boolean refuelBeforeSwitch = false;
+    private boolean refuelImmediately = false;
 
     public TeamAgent3(String name, int xpos, int ypos, TWEnvironment env, double fuelLevel) {
 	super(xpos, ypos, env, fuelLevel);
 	this.name = name;
+	this.memory = new AgentMemory(this.getEnvironment(), this.name, this.getCurrentAgentTile());
+	this.refuelScheduler = RefuelScheduler.getInstance();
     }
 
     private boolean foundFuelStation() {
@@ -92,18 +101,99 @@ public class TeamAgent3 extends TWAgent {
 
 	return true;
     }
+    
+    private void notifyDistanceToFuelStation() {
+	int distanceToFuelStation = this.distanceToFuelStation();
+	this.refuelScheduler.addRefuelAgent(distanceToFuelStation, name);
+	Map<String, Integer> refuelAgents = this.refuelScheduler.getOrderedRefuelAgents();
+	if (refuelAgents == null) {
+	    return;
+	}
+	
+	for (Map.Entry<String, Integer> entry : refuelAgents.entrySet()) {
+            String agentName = entry.getKey();
+            Integer refuelInterval = entry.getValue();
+            this.addTempAllMessage(Constants.REFUEL_SCHEDULE + " " + agentName + " " + refuelInterval);
+	}
+	
+    }
+    
+    private void reactToFoundFuelStationMessage(String[] words) {
+	if (this.foundFuelStation()) {
+	    return;
+	}
+	int fuelX = Integer.parseInt(words[1]);
+	int fuelY = Integer.parseInt(words[2]);
+	this.memory.setFuelTile(fuelX, fuelY);
+	this.notifyDistanceToFuelStation();
+    }
+    
+    private void reactToUpdateMemoryMapMessage(String[] words) {
+	int objectX = Integer.parseInt(words[1]);
+	    int objectY = Integer.parseInt(words[2]);
+	    String objectStatus = words[3];
+	    if (objectStatus == "null")
+		return;
+	    Object object = this.getMemory().getMemoryGrid().get(objectX, objectY);
+	    if (object instanceof TWTile) {
+		if (this.distanceToTile(objectX, objectY) < this.distanceToTile(this.closestTile.x,
+			closestTile.y) || !this.isValidEntity(closestTile)) {
+		    this.closestTile.x = objectX;
+		    this.closestTile.y = objectY;
+		}
+		return;
+	    } else if (object instanceof TWHole) {
+		if (this.distanceToTile(objectX, objectY) < this.distanceToTile(this.closestHole.x,
+			closestHole.y) || !this.isValidEntity(closestTile)) {
+		    this.closestHole.x = objectX;
+		    this.closestHole.y = objectY;
+		}
+		return;
+	    }
+    }
+    
+    private void reactToRequestZoneSwitchMessage(String[] words) {
+	String agentNameSwitchingZones = words[1];
+	String zoneAgentIsSwitchingTo = words[2];
+	String freeZone = words[3];
+	
+	if (agentNameSwitchingZones.equals(this.name)) {
+	    return;
+	}
+	
+	if (!zoneAgentIsSwitchingTo.equals(this.memory.getZone().getZoneName())) {
+	    return;
+	}
+	this.memory.setZoneByName(freeZone, this.getCurrentAgentTile());
+	
+	if (this.fuelLevel < 100) {
+	    this.refuelBeforeSwitch = true;
+	}
+    }
+    
+    private AgentTile getCurrentAgentTile() {
+	return new AgentTile(this.getX(), this.getY());
+    }
+    
+    private void reactToRefuelScheduleMessage(String[] words) {
+	String targetAgentName = words[1];
+	int refuelSchedule = Integer.parseInt(words[2]);
+	
+	if (!targetAgentName.equals(this.name)) {
+	    return;
+	}
+	
+	this.earlyRequestRefuelTimer = refuelSchedule;
+    }
 
     private void checkMessages() {
 	if (this.tileInFOV(closestTile)) {
-	    System.out.println("Reset, since tile should be in FOV");
 	    this.closestTile = new AgentTile(-1, -1);
 	}
 	if (this.tileInFOV(closestHole)) {
-	    System.out.println("Reset, since tile should be in FOV");
 	    this.closestHole = new AgentTile(-1, -1);
 	}
 	for (Message message : this.getEnvironment().getMessages()) {
-	    System.out.println(message.getMessage());
 	    String[] splitMessage = message.getMessage().split(";");
 	    String[] words;
 	    String messageType;
@@ -112,36 +202,19 @@ public class TeamAgent3 extends TWAgent {
 		messageType = words[0];
 		switch (messageType) {
 		case Constants.FOUND_FUEL_STATION_MESSAGE:
-		    int fuelX = Integer.parseInt(words[1]);
-		    int fuelY = Integer.parseInt(words[2]);
-		    this.memory.setFuelTile(fuelX, fuelY);
+		    this.reactToFoundFuelStationMessage(words);
 		    break;
-		// found object(s)
 		case Constants.UPDATE_MEMORY_MAP_MESSAGE:
-		    int objectX = Integer.parseInt(words[1]);
-		    int objectY = Integer.parseInt(words[2]);
-		    String objectStatus = words[3];
-		    if (objectStatus == "null")
-			break;
-		    Object object = this.getMemory().getMemoryGrid().get(objectX, objectY);
-		    if (object instanceof TWTile) {
-			// System.out.println("Adding tile to frontier");
-			// this.candidateTiles.add(new AgentTile(objectX, objectY));
-			if (this.distanceToTile(objectX, objectY) < this.distanceToTile(this.closestTile.x,
-				closestTile.y) || !this.isValidEntity(closestTile)) {
-			    this.closestTile.x = objectX;
-			    this.closestTile.y = objectY;
-			}
-			break;
-		    } else if (object instanceof TWHole) {
-			// System.out.println("Adding hole to frontier");
-			if (this.distanceToTile(objectX, objectY) < this.distanceToTile(this.closestHole.x,
-				closestHole.y) || !this.isValidEntity(closestTile)) {
-			    this.closestHole.x = objectX;
-			    this.closestHole.y = objectY;
-			}
-			break;
-		    }
+		    this.reactToUpdateMemoryMapMessage(words);
+		    break;
+		    
+		case Constants.REFUEL_SCHEDULE:
+		    this.reactToRefuelScheduleMessage(words);
+		    break;
+		    
+		case Constants.REQUEST_ZONE_SWITCH:
+		    this.reactToRequestZoneSwitchMessage(words);
+		    break;
 		}
 	    }
 	}
@@ -168,10 +241,27 @@ public class TeamAgent3 extends TWAgent {
     private int distanceToFuelStation() {
 	return distanceToTile(this.memory.getFuelTile().x, this.memory.getFuelTile().y);
     }
+    
+    private void requestZoneSwitch() {
+	this.resetEarlyRequestRefuelTimer();
+	String zoneNameToSwitchTo = this.memory.getFuelStationZone().getZoneName();
+	String myZone = this.memory.getZone().getZoneName();
+	if (zoneNameToSwitchTo.equals(myZone)) {
+	    return;
+	}
+	this.addTempAllMessage(Constants.REQUEST_ZONE_SWITCH + " " + this.name +  " " + zoneNameToSwitchTo + " " + myZone);
+	this.memory.setZoneByName(zoneNameToSwitchTo, this.getCurrentAgentTile());
+	this.refuelImmediately = true;
+    }
+    
+    private void resetEarlyRequestRefuelTimer() {
+	this.earlyRequestRefuelTimer = 75;
+    }
 
     private boolean fuelLevelCritical() {
 	if (!this.foundFuelStation())
 	    return false;
+	
 	return (this.fuelLevel < this.distanceToFuelStation() + 5);
     }
 
@@ -208,33 +298,47 @@ public class TeamAgent3 extends TWAgent {
 	}
 	return true;
     }
+    
+    private void rememberExplorationTarget() {
+	if (this.memory.isDistracted) {
+	    this.memory.swapLastExplorationTile();
+	}
+    }
 
     private void updateNextThought() {
 	if (this.fuelLevelCritical()) {
-	    System.out.println("Setting in fuel level");
 	    this.goToFuelStation();
 	    return;
 	}
-
+	
+	System.out.println(this.name + " requesting switch in " + (this.fuelLevel - this.earlyRequestRefuelTimer - this.distanceToFuelStation()));
+	if (this.fuelLevel < this.earlyRequestRefuelTimer + this.distanceToFuelStation()) {
+	    this.requestZoneSwitch();
+	}
+	
 	if (this.carriedTiles.size() > 1 && this.isValidHole(closestHole)) {
-	    System.out.println("Going to hole...");
-	    boolean valid = this.isValidHole(closestHole);
-	    System.out.println(valid);
+	    this.rememberExplorationTarget();
 	    this.goToTile(closestHole);
+	    this.memory.isDistracted = true;
 	    // this.exploring = false;
 	    return;
 	}
 
 	if (this.carriedTiles.size() < 2 && this.isValidTile(closestTile)) {
-	    System.out.println("Going to tile...");
-	    System.out.println(closestTile.x);
-	    System.out.println(closestTile.y);
+	    this.rememberExplorationTarget();
 	    this.goToTile(closestTile);
-	    // this.exploring = false;
+	    this.memory.isDistracted = true;
 	    return;
 	}
 	
+	if (this.refuelBeforeSwitch || this.refuelImmediately) {
+	    this.goToFuelStation();
+	    return;
+	}
+	
+	
 	if (!this.memory.currentPathValid()) {
+	    this.memory.isDistracted = false;
 	    this.explore();
 	    return;
 	}
@@ -242,7 +346,7 @@ public class TeamAgent3 extends TWAgent {
     }
 
     protected TWThought think() {
-	
+	System.out.println(this.name + " currently occupies " + this.memory.getZone().getZoneName());
 	this.checkMessages();
 	
 	if (!this.foundFuelStation()) {
@@ -296,6 +400,9 @@ public class TeamAgent3 extends TWAgent {
 	case REFUEL:
 	    this.refuel();
 	    this.memory.setCurrentPath(null);
+	    this.resetEarlyRequestRefuelTimer();
+	    this.refuelBeforeSwitch = false;
+	    this.refuelImmediately = false;
 
 	    if (!AgentParameter.isPickNeedOneStep) {
 		act(this.think());

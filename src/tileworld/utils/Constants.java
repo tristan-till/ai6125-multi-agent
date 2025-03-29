@@ -18,6 +18,15 @@ public class Constants {
 	public static final String GO_FIND_FUEL_STATION_MESSAGE = "GoToFindFuelStation";
 	public static final String FOUND_FUEL_STATION_MESSAGE = "FindFuelStation";
 	public static final String DENSE_AREA_FOUND = "bPlanPickAreaUpdate";
+	public static final String DISTANCE_TO_FUEL_STATION_MESSAGE = "DistanceToFuelStation";
+	public static final String REQUEST_ZONE_SWITCH = "RequestZoneSwitch";
+	public static final String ACCEPT_ZONE_SWITCH = "AcceptZoneSwitch";
+	
+	public static final String ZONE_1_NAME = "Zone1Name";
+	public static final String ZONE_2_NAME = "Zone2Name";
+	public static final String ZONE_3_NAME = "Zone3Name";
+	
+	public static final String REFUEL_SCHEDULE = "RefuelSchedule";
 	
 	public static String SEARCH_SCHEME = "A";
 	public static String PICK_SCHEME = "B";

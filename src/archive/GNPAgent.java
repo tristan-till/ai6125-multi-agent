@@ -1,5 +1,9 @@
-package tileworld.agent;
+package archive;
 
+import tileworld.agent.TWAction;
+import tileworld.agent.TWAgent;
+import tileworld.agent.TWAgentWorkingMemory;
+import tileworld.agent.TWThought;
 import tileworld.environment.TWDirection;
 import tileworld.environment.TWEnvironment;
 import tileworld.exceptions.CellBlockedException;

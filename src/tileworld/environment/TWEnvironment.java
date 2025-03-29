@@ -6,6 +6,7 @@ package tileworld.environment;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
+import archive.GNPAgent;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.grid.ObjectGrid2D;
@@ -16,7 +17,6 @@ import tileworld.Parameters;
 import tileworld.TWGUI;
 import tileworld.agent.Message;
 import tileworld.agent.SimpleTWAgent;
-import tileworld.agent.GNPAgent;
 import tileworld.agent.TWAgent;
 import tileworld.agent.TeamAgent1;
 import tileworld.agent.TeamAgent2;
