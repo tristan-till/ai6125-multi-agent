@@ -9,6 +9,9 @@ import sim.portrayal.Inspector;
 import sim.portrayal.LocationWrapper;
 import sim.portrayal.Portrayal;
 import tileworld.Parameters;
+import tileworld.agent.Message;
+import tileworld.agent.TWAgentPortrayal;
+import tileworld.agent.TWAgentSensor;
 import tileworld.environment.TWDirection;
 import tileworld.environment.TWEntity;
 import tileworld.environment.TWEnvironment;
@@ -32,7 +35,13 @@ import tileworld.exceptions.CellBlockedException;
  */
 public abstract class TWAgent extends TWEntity implements Steppable {
 
+    public void addTempMessage(String mess){}
+
+    public void addTempAllMessage(String mess){}
+
     protected int score;
+
+    public Color color = Color.blue;
 
     public int getScore() {
         return score;
@@ -43,7 +52,7 @@ public abstract class TWAgent extends TWEntity implements Steppable {
        
         this.score = 0;
         this.fuelLevel = fuelLevel;
-        this.carriedTiles = new ArrayList<TWTile>();
+        this.carriedTiles = new ArrayList<TWTile>();  
         this.sensor = new TWAgentSensor(this, Parameters.defaultSensorRange);
         this.memory = new TWAgentWorkingMemory_(this, env.schedule, env.getxDimension(), env.getyDimension());
     }
@@ -59,6 +68,7 @@ public abstract class TWAgent extends TWEntity implements Steppable {
      * Sensor class, used for getting information about the environment.
      */
     protected TWAgentSensor sensor;
+
     /**
      * Memory which stores sensed facts in the form of tuples (see TWAgentMemoryFact)
      */

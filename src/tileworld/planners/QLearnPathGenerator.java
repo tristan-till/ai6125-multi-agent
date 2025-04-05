@@ -95,7 +95,7 @@ public class QLearnPathGenerator implements TWPathGenerator {
             cy = sy + bestAction.dy;
             path.prependStep(cx, cy);
             // TODO: Determine Reward function for tiles and add it in.
-            updateQValue(sx, sy, bestAction, reward, cx, cy);
+            // updateQValue(sx, sy, bestAction, reward, cx, cy);
 
         }
         return path;

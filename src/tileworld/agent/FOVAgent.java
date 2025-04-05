@@ -7,7 +7,7 @@ import tileworld.environment.TWEnvironment;
 import tileworld.environment.TWHole;
 import tileworld.environment.TWTile;
 import tileworld.exceptions.CellBlockedException;
-import tileworld.planners.AstarPathGenerator;
+import tileworld.planners.AstarWAgentCost;
 import tileworld.planners.TWPath;
 import tileworld.utils.Constants;
 
@@ -23,7 +23,7 @@ import tileworld.utils.Constants;
  *         Description:
  *
  */
-public class TeamAgent3 extends TWAgent {
+public class FOVAgent extends TWAgent {
 	/**
 	 * 
 	 */
@@ -33,7 +33,7 @@ public class TeamAgent3 extends TWAgent {
 
 	private final int mapSizeX = this.getEnvironment().getxDimension();
 	private final int mapSizeY = this.getEnvironment().getyDimension();
-	private AstarPathGenerator pathGenerator = new AstarPathGenerator(this.getEnvironment(), this,
+	private AstarWAgentCost pathGenerator = new AstarWAgentCost(this.getEnvironment(), this,
 			this.mapSizeX + this.mapSizeY);
 
 	private AgentMemory memory;
@@ -41,7 +41,6 @@ public class TeamAgent3 extends TWAgent {
 	private String tempMessage = "";
 	private String tempAllMessage = "";
 
-	// private List<AgentTile> candidateTiles = new ArrayList<AgentTile>();
 	private AgentTile closestTile = new AgentTile(-1, -1);
 	private AgentTile closestHole = new AgentTile(-1, -1);
 
@@ -50,7 +49,7 @@ public class TeamAgent3 extends TWAgent {
 	private boolean refuelBeforeSwitch = false;
 	private boolean refuelImmediately = false;
 
-	public TeamAgent3(String name, int xpos, int ypos, TWEnvironment env, double fuelLevel) {
+	public FOVAgent(String name, int xpos, int ypos, TWEnvironment env, double fuelLevel) {
 		super(xpos, ypos, env, fuelLevel);
 		this.name = name;
 		this.memory = new AgentMemory(this.getEnvironment(), this.name, this.getCurrentAgentTile());
@@ -81,6 +80,13 @@ public class TeamAgent3 extends TWAgent {
 
 	private void goToTile(AgentTile tile) {
 		this.goToXY(tile.x, tile.y);
+	}
+
+  private void exploreTile(AgentTile tile) {
+    int[] closestAgent = this.getMemory().getClosestAgent();
+    this.getMemory().resetClosestAgent();
+    TWPath path = pathGenerator.explorePath(this.getX(), this.getY(), tile.x, tile.y, closestAgent[0], closestAgent[1]);
+    this.memory.setCurrentPath(path);
 	}
 
 	private TWPath findPath(int x, int y) {
@@ -270,7 +276,7 @@ public class TeamAgent3 extends TWAgent {
 	}
 
 	private void explore() {
-		this.goToTile(this.memory.getExplorationTile());
+		this.exploreTile(this.memory.getExplorationTile());
 	}
 
 	private boolean isValidEntity(AgentTile tile) {

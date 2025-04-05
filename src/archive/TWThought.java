@@ -4,6 +4,7 @@
  */
 package archive;
 
+import tileworld.agent.TWAction;
 import tileworld.environment.TWDirection;
 
 /**

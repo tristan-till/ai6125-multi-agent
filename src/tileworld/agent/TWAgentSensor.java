@@ -29,7 +29,6 @@ import tileworld.environment.TWEnvironment;
  */
 public class TWAgentSensor {
 
-
     TWAgent me;
     int sensorRange;
 

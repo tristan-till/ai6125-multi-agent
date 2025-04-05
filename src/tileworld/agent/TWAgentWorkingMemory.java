@@ -55,6 +55,10 @@ public class TWAgentWorkingMemory {
 	public TWAgentPercept[][] getObjects(){
 		return objects;
 	}
+
+	public TWAgentPercept[][] getAgents(){
+		return objects;
+	}
 	/**
 	 * Number of items recorded in memory, currently doesn't decrease as memory
 	 * is not degraded - nothing is ever removed!
@@ -65,12 +69,14 @@ public class TWAgentWorkingMemory {
 	 * null if no objects are in sensor range
 	 */
 	private HashMap<Class<?>, TWEntity> closestInSensorRange;
+	private int[] closestAgentPositionInSensorRange;
 	static private List<Int2D> spiral = new NeighbourSpiral(Parameters.defaultSensorRange * 4).spiral();
 	//    private List<TWAgent> neighbouringAgents = new ArrayList<TWAgent>();
 
 	// x, y: the dimension of the grid
 	public TWAgentWorkingMemory(TWAgent moi, Schedule schedule, int x, int y) {
 		closestInSensorRange = new HashMap<Class<?>, TWEntity>(4);
+		this.closestAgentPositionInSensorRange = null;
 		this.me = moi;
 		this.objects = new TWAgentPercept[x][y]; 
 		this.estimatedRemoveObject = new Class<?>[x][y];
@@ -92,61 +98,55 @@ public class TWAgentWorkingMemory {
 		System.out.println("object life estimate: "+objectLifetimeEstimate(per));
 	}
 
-	public void addObject(Object obj, int x, int y, int firstT, int lastT, int ax, int ay){
-		if (obj == null){
-			if (objects[x][y] != null){
-				memorySize--;
-				TWAgentPercept memoryOBJ = objects[x][y];
-				// learn estimateLifeTime
-				assert ((estimateLifeTime - objectLifetimeEstimate(memoryOBJ)) >= 0);
-				if (Math.abs(x-ax)+Math.abs(y-ay) >= 2){ 
-					// printTWPerception(memoryOBJ);
-					estimateLifeTime -= Math.min((estimateLifeTime - objectLifetimeEstimate(memoryOBJ)), estimateLifeTime/5) * AgentParameter.lifetimeLearningRate * estimateLifeTime/100; 
-					// if(AgentParameter.lifetimeLearningRate > 0.001)AgentParameter.lifetimeLearningRate *= 0.99;
-				}
-				removeObject(x,y);
-			}
-			lastNullPerceptTime[x][y] = (int) schedule.getTime();
-		} else if (obj instanceof TWObject){
-			TWObject twObj = (TWObject) obj;
-			if(objects[x][y] == null) {
-				memorySize++;
-				if (estimatedRemoveObject[x][y]==twObj.getClass()){
-					int fT = estimatedRemoveObjectTime[x][y][0];
-					int rT = estimatedRemoveObjectTime[x][y][1];
-					if (schedule.getTime() - fT > estimateLifeTime*1.5){
-
-					} else { // remove
-						assert ((schedule.getTime() - rT) > 0);
-						estimateLifeTime += Math.min((schedule.getTime() - rT), estimateLifeTime/2) * AgentParameter.lifetimeLearningRate * (50.0/estimateLifeTime+estimateLifeTime/50.0);
-						// if(AgentParameter.lifetimeLearningRate > 0.001)AgentParameter.lifetimeLearningRate *= 0.99;
-					}
-				}
-			} else {
-				TWAgentPercept memoryOBJ = objects[x][y];
-				if (memoryOBJ.getO().getClass() != twObj.getClass()){
+		public void addObject(Object obj, int x, int y, int firstT, int lastT, int ax, int ay){
+			if (obj == null){
+				if (objects[x][y] != null){
+					memorySize--;
+					TWAgentPercept memoryOBJ = objects[x][y];
+					// learn estimateLifeTime
 					assert ((estimateLifeTime - objectLifetimeEstimate(memoryOBJ)) >= 0);
 					if (Math.abs(x-ax)+Math.abs(y-ay) >= 2){ 
-						System.out.println("Penalty time: "+(estimateLifeTime - objectLifetimeEstimate(memoryOBJ)));
-						estimateLifeTime -= Math.min((estimateLifeTime - objectLifetimeEstimate(memoryOBJ)), estimateLifeTime/5) * AgentParameter.lifetimeLearningRate* estimateLifeTime/100;
+						// printTWPerception(memoryOBJ);
+						estimateLifeTime -= Math.min((estimateLifeTime - objectLifetimeEstimate(memoryOBJ)), estimateLifeTime/5) * AgentParameter.lifetimeLearningRate * estimateLifeTime/100; 
 						// if(AgentParameter.lifetimeLearningRate > 0.001)AgentParameter.lifetimeLearningRate *= 0.99;
 					}
-				} else {
-
+					removeObject(x,y);
 				}
-			}
-
-			objects[x][y] = new TWAgentPercept(twObj, lastT, firstT);
-			memoryGrid.set(x, y, twObj);
-			updateClosest(twObj);
-		} 
-		// else if (obj instanceof TWHole){
-
-		// } else if (obj instanceof TWObstacle){
-
-		// }
+				lastNullPerceptTime[x][y] = (int) schedule.getTime();
+			} else if (obj instanceof TWObject){
+				TWObject twObj = (TWObject) obj;
+				if(objects[x][y] == null) {
+					memorySize++;
+					if (estimatedRemoveObject[x][y]==twObj.getClass()){
+						int fT = estimatedRemoveObjectTime[x][y][0];
+						int rT = estimatedRemoveObjectTime[x][y][1];
+						if (schedule.getTime() - fT > estimateLifeTime*1.5){
+	
+						} else { // remove
+							assert ((schedule.getTime() - rT) > 0);
+							estimateLifeTime += Math.min((schedule.getTime() - rT), estimateLifeTime/2) * AgentParameter.lifetimeLearningRate * (50.0/estimateLifeTime+estimateLifeTime/50.0);
+							// if(AgentParameter.lifetimeLearningRate > 0.001)AgentParameter.lifetimeLearningRate *= 0.99;
+						}
+					}
+				} else {
+					TWAgentPercept memoryOBJ = objects[x][y];
+					if (memoryOBJ.getO().getClass() != twObj.getClass()){
+						assert ((estimateLifeTime - objectLifetimeEstimate(memoryOBJ)) >= 0);
+						if (Math.abs(x-ax)+Math.abs(y-ay) >= 2){ 
+							System.out.println("Penalty time: "+(estimateLifeTime - objectLifetimeEstimate(memoryOBJ)));
+							estimateLifeTime -= Math.min((estimateLifeTime - objectLifetimeEstimate(memoryOBJ)), estimateLifeTime/5) * AgentParameter.lifetimeLearningRate* estimateLifeTime/100;
+							// if(AgentParameter.lifetimeLearningRate > 0.001)AgentParameter.lifetimeLearningRate *= 0.99;
+						}
+					} else {
+	
+					}
+				}
+	
+				objects[x][y] = new TWAgentPercept(twObj, lastT, firstT);
+				memoryGrid.set(x, y, twObj);
+				updateClosest(twObj);
+			} 
 	}
-
 	public void updateMemory(String message){
 		updateMemory(message, -1, -1);
 	}
@@ -196,7 +196,26 @@ public class TWAgentWorkingMemory {
 
 		//must all be same size.
 		assert (sensedObjects.size() == objectXCoords.size() && sensedObjects.size() == objectYCoords.size());
+		assert (sensedAgents.size() == agentXCoords.size() && sensedAgents.size() == agentYCoords.size());
 		//System.out.println(sensedObjects.size()); // 7*7 if the sensor range doesn't exceed the env range
+		
+		for (int i = 0; i < sensedAgents.size(); i++) {
+			if (sensedAgents.get(i) instanceof TWAgent){
+				TWAgent o = (TWAgent) sensedAgents.get(i);
+				this.me.addTempAllMessage("Found Agent at " + o.getX() + " " + o.getY());
+				if (this.closestAgentPositionInSensorRange != null) {
+					double currentDistance = getDistance(this.me.getX() , agentXCoords.get(i), this.me.getY() , agentYCoords.get(i));
+					double previousDistance = getDistance(this.me.getX() , agentXCoords.get(i), this.me.getY() , agentYCoords.get(i));
+					if (currentDistance < previousDistance){
+						updateClosestAgent(agentXCoords.get(i), agentYCoords.get(i));
+					}
+				} else {
+					this.closestAgentPositionInSensorRange = new int[2];
+					updateClosestAgent(agentXCoords.get(i), agentYCoords.get(i));
+				}
+			}
+		}
+		
 
 		for (int i = 0; i < sensedObjects.size(); i++) {
 			TWEntity o = (TWEntity) sensedObjects.get(i);
@@ -297,6 +316,11 @@ public class TWAgentWorkingMemory {
 		}
 	}
 
+	public static double getDistance(int x1, int y1, int x2, int y2) {
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+    return Math.sqrt(dx * dx + dy * dy);
+}
 
 	/**
 	 * @return
@@ -405,6 +429,19 @@ public class TWAgentWorkingMemory {
 		if (closestInSensorRange.get(o.getClass()) == null || me.closerTo(o, closestInSensorRange.get(o.getClass()))) {
 			closestInSensorRange.put(o.getClass(), o);
 		}
+	}
+
+	private void updateClosestAgent(int x, int y) {
+		closestAgentPositionInSensorRange[0] = x;
+		closestAgentPositionInSensorRange[1] = y;
+	}
+
+	public int[] getClosestAgent() {
+		return closestAgentPositionInSensorRange;
+	}
+
+	public void resetClosestAgent() {
+		this.closestAgentPositionInSensorRange = null;
 	}
 
 	/**

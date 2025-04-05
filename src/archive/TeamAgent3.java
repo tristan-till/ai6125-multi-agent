@@ -1,5 +1,7 @@
 package archive;
 
+import tileworld.agent.Message;
+import tileworld.agent.TWAction;
 import tileworld.environment.*;
 import tileworld.exceptions.CellBlockedException;
 import tileworld.planners.*;
