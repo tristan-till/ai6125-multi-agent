@@ -23,20 +23,40 @@ public class Parameters {
     //Agent Parameters
     public static final int defaultFuelLevel = 500;
     public static final int defaultSensorRange = 3;
+    
+    public static final int config1XYDimensions = 50;
+    public static final double config1Mean = 0.2;
+    public static final double config1Dev = 0.05f;
+    public static final int config1Lifetime = 100;
+    
+    public static final int config2XYDimensions = 80;
+    public static final double config2Mean = 2.0;
+    public static final double config2Dev = 0.5f;
+    public static final int config2Lifetime = 30;
+    
+    
 
     //Environment Parameters
-    public static final int xDimension = 50; //size in cells
-    public static final int yDimension = 50;
+    // public static final int xDimension = config1XYDimensions; //size in cells
+    // public static final int yDimension = config1XYDimensions;
+    
 
-    //Object Parameters
-    // mean, dev: control the number of objects to be created in every time step (i.e. average object creation rate)
-    public static final double tileMean = 0.2;
-    public static final double holeMean = 0.2;
-    public static final double obstacleMean = 0.2;
-    public static final double tileDev = 0.05f;
-    public static final double holeDev = 0.05f;
-    public static final double obstacleDev = 0.05f;
-    // the life time of each object
-    public static final int lifeTime = 100;
+    // public static final double tileMean = config1Mean;
+    // public static final double holeMean = config1Mean;
+    // public static final double obstacleMean = config1Mean;
+    // public static final double tileDev = config1Dev;
+    // public static final double holeDev = config1Dev;
+    // public static final double obstacleDev = config1Dev;
+    // public static final int lifeTime = config1Lifetime;
+    
+    public static final int xDimension = config2XYDimensions; //size in cells
+    public static final int yDimension = config2XYDimensions;
+    public static final double tileMean = config2Mean;
+    public static final double holeMean = config2Mean;
+    public static final double obstacleMean = config2Mean;
+    public static final double tileDev = config2Dev;
+    public static final double holeDev = config2Dev;
+    public static final double obstacleDev = config2Dev;
+    public static final int lifeTime = config2Lifetime;
 
 }

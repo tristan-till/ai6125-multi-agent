@@ -18,8 +18,6 @@ import tileworld.TWGUI;
 import tileworld.agent.Message;
 import tileworld.agent.SimpleTWAgent;
 import tileworld.agent.TWAgent;
-import tileworld.agent.TeamAgent1;
-import tileworld.agent.TeamAgent2;
 import tileworld.agent.TeamAgent3;
 
 /**
