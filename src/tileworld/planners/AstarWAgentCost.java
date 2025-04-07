@@ -7,7 +7,6 @@ package tileworld.planners;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import archive.TeamAgent3;
 import tileworld.agent.TWAgent;
 import tileworld.environment.TWEnvironment;
 
@@ -47,7 +46,7 @@ public class AstarWAgentCost implements TWPathGenerator {
     /** Reference to this agent, for looking in memory */
     private TWAgent agent;
     /** Agent Proximity Cost Multiplier */
-    private double agentProximityMultiplier = 1.0;
+    private double agentProximityMultiplier = 4.0;
 
     /**
      * Use the Euclidian distance heuristic here (could also try manhattan)
@@ -413,7 +412,7 @@ public class AstarWAgentCost implements TWPathGenerator {
     }
 
     public double getAgentProximityCost(int sx, int sy, int nearAgentx, int nearAgenty) {
-      return agentProximityMultiplier * map.getDistance(sx, sy, nearAgentx, nearAgenty);
+      return agentProximityMultiplier / map.getDistance(sx, sy, nearAgentx, nearAgenty);
     }
 
     /**
