@@ -15,6 +15,7 @@ import sim.util.Int2D;
 import sun.font.TrueTypeFont;
 import tileworld.Parameters;
 import tileworld.TWGUI;
+import tileworld.agent.FOVAgent;
 import tileworld.agent.Message;
 import tileworld.agent.SimpleTWAgent;
 import tileworld.agent.TWAgent;
@@ -116,14 +117,14 @@ public class TWEnvironment extends SimState implements Steppable {
         //createAgent(new SimpleTWAgent("agent1", pos.getX(), pos.getY(), this, Parameters.defaultFuelLevel));
         //createAgent(new GNPAgent("agent1", pos.getX(), pos.getY(), this, Parameters.defaultFuelLevel));
         // createAgent(new TeamAgent1("agent1", pos.getX(), pos.getY(), this, Parameters.defaultFuelLevel));
-        createAgent(new TeamAgent3("agent1", pos.getX(), pos.getY(), this, Parameters.defaultFuelLevel));
+        createAgent(new FOVAgent("agent1", pos.getX(), pos.getY(), this, Parameters.defaultFuelLevel));
         pos = this.generateRandomLocation();
         //createAgent(new SimpleTWAgent("agent2", pos.getX(), pos.getY(), this, Parameters.defaultFuelLevel));
         //createAgent(new GNPAgent("agent2", pos.getX(), pos.getY(), this, Parameters.defaultFuelLevel));
         // createAgent(new TeamAgent2("agent2", pos.getX(), pos.getY(), this, Parameters.defaultFuelLevel));
-        createAgent(new TeamAgent3("agent2", pos.getX(), pos.getY(), this, Parameters.defaultFuelLevel));
+        createAgent(new FOVAgent("agent2", pos.getX(), pos.getY(), this, Parameters.defaultFuelLevel));
         
-        createAgent(new TeamAgent3("agent3", pos.getX(), pos.getY(), this, Parameters.defaultFuelLevel));
+        createAgent(new FOVAgent("agent3", pos.getX(), pos.getY(), this, Parameters.defaultFuelLevel));
         //create the fueling station
         pos = this.generateRandomLocation();
         fuelingStation = new TWFuelStation(pos.getX(), pos.getY(),this);

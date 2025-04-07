@@ -21,6 +21,7 @@ public class Constants {
 	public static final String DISTANCE_TO_FUEL_STATION_MESSAGE = "DistanceToFuelStation";
 	public static final String REQUEST_ZONE_SWITCH = "RequestZoneSwitch";
 	public static final String ACCEPT_ZONE_SWITCH = "AcceptZoneSwitch";
+	public static final String UPDATE_AGENT_ZONE = "UpdateAgentZone";
 	
 	public static final String ZONE_1_NAME = "Zone1Name";
 	public static final String ZONE_2_NAME = "Zone2Name";

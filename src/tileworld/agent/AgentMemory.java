@@ -74,6 +74,10 @@ public class AgentMemory {
         this.myZone = zoneManager.getZoneByZoneName(requestedZoneName);
         this.initializeAgentTiles(currentAgentTile);
     }
+    
+    public void setFreeZone(String freeZoneName) {
+	this.zoneManager.setFreeZone(freeZoneName);
+    }
 
     public AgentTile getExplorationTile() {
         AgentTile randomTile = this.candidateTiles.getFirst();
@@ -138,5 +142,12 @@ public class AgentMemory {
 
     public AgentZone getZone() {
         return this.myZone;
+    }
+    
+    public void randomlySwitchZone(AgentTile agentTile) {
+	String otherZoneName = this.zoneManager.getRandomOtherZoneName(this.myZone.getZoneName());
+	this.myZone = zoneManager.getZoneByZoneName(otherZoneName);
+        this.initializeAgentTiles(agentTile);
+	return;
     }
 }

@@ -104,8 +104,31 @@ public class ZoneManager {
 	zone3 = new AgentZone(Constants.ZONE_3_NAME, zoneMinX, zoneMaxX, zoneMinY, zoneMaxY);
 	this.freeZones.add(zone3);
     }
+    
+    public String getRandomOtherZoneName(String zoneName) {
+	switch (zoneName) {
+	case Constants.ZONE_1_NAME:
+	    if (Math.random() < 0.5) {
+		return Constants.ZONE_2_NAME;
+	    }
+	    return Constants.ZONE_3_NAME;
+	    
+	case Constants.ZONE_2_NAME:
+    	    if (Math.random() < 0.5) {
+    		return Constants.ZONE_1_NAME;
+    	    }
+    	    return Constants.ZONE_3_NAME;
+    	    
+	case Constants.ZONE_3_NAME:
+            if (Math.random() < 0.5) {
+        	return Constants.ZONE_1_NAME;
+            }
+            return Constants.ZONE_2_NAME;
+	}
+	return null;
+    }
 
-    private void setFreeZone(String freeZoneName) {
+    public void setFreeZone(String freeZoneName) {
 	switch (freeZoneName) {
 	case Constants.ZONE_1_NAME:
 	    this.freeZones.add(zone1);
@@ -132,6 +155,11 @@ public class ZoneManager {
     }
 
     public AgentZone getZoneByZoneName(String zoneName) {
+	if (this.freeZones.size() > 0) {
+	    AgentZone freeZone = this.freeZones.getFirst();
+	    this.freeZones.removeFirst();
+	    return freeZone;
+	}
 	return this.fetchZoneByName(zoneName);
     }
 
