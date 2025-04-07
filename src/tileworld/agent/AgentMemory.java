@@ -133,8 +133,9 @@ public class AgentMemory {
     }
 
     public TWThought getNextThought() {
-        if (!this.currentPathValid())
+        if (!this.currentPathValid()) {
             return null;
+        }
         TWPathStep nextStep = this.currentPath.popNext();
         TWThought nextThought = new TWThought(TWAction.MOVE, nextStep.getDirection());
         return nextThought;

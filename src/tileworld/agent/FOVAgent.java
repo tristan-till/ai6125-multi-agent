@@ -91,7 +91,10 @@ public class FOVAgent extends TWAgent {
 	}
 	TWPath path = pathGenerator.explorePath(this.getX(), this.getY(), tile.x, tile.y, closestAgent[0],
 		closestAgent[1]);
-	
+	if (path == null) {
+	    this.goToTile(this.memory.getExplorationTile());
+	    return;
+	}
 	this.memory.setCurrentPath(path);
     }
 
@@ -287,7 +290,10 @@ public class FOVAgent extends TWAgent {
 	this.addTempAllMessage(
 		Constants.REQUEST_ZONE_SWITCH + " " + this.name + " " + zoneNameToSwitchTo + " " + myZone);
 	this.memory.setZoneByName(zoneNameToSwitchTo, this.getCurrentAgentTile());
+	// if (this.fuelLevel < this.distanceToFuelStation() + 50) {
 	this.refuelImmediately = true;
+	// }
+	
     }
 
     private void resetEarlyRequestRefuelTimer() {
