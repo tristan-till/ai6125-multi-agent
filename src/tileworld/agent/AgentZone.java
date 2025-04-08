@@ -69,7 +69,7 @@ public class AgentZone {
     private AgentTile goRight(AgentTile node) {
 	int currentX = node.x;
 	AgentTile nextNode = null;
-	while (currentX < this.maxX - this.FOV) {
+	while (currentX < this.maxX - this.FOV - this.stepSize - 2) {
 	    currentX += this.stepSize;
 	    nextNode = new AgentTile(currentX, node.y);
 	    nodes.add(nextNode);
@@ -82,12 +82,12 @@ public class AgentZone {
     private AgentTile goLeft(AgentTile node) {
 	int currentX = node.x;
 	AgentTile nextNode = null;
-	while (currentX > this.minX + this.FOV + this.stepSize) {
+	while (currentX > this.minX + this.FOV + this.stepSize + 2) {
 	    currentX -= this.stepSize;
 	    nextNode = new AgentTile(currentX, node.y);
 	    nodes.add(nextNode);
 	}
-	nextNode = new AgentTile(this.minX + this.FOV, node.y);
+	nextNode = new AgentTile(this.minX + this.stepSize + this.FOV - 1, node.y);
 	nodes.add(nextNode);
 	return nextNode;
     }
