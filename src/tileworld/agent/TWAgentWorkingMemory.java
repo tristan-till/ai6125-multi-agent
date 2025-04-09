@@ -202,7 +202,11 @@ public class TWAgentWorkingMemory {
 		for (int i = 0; i < sensedAgents.size(); i++) {
 			if (sensedAgents.get(i) instanceof TWAgent){
 				TWAgent o = (TWAgent) sensedAgents.get(i);
-				this.me.addTempAllMessage("Found Agent at " + o.getX() + " " + o.getY());
+				// Prevent catching self
+				if(this.me.getX() ==  agentXCoords.get(i) && this.me.getY() == agentYCoords.get(i)){
+					continue;
+				}
+				this.me.addTempAllMessage("Found Agent at " + agentXCoords.get(i) + " " + agentYCoords.get(i));
 				if (this.closestAgentPositionInSensorRange != null) {
 					double currentDistance = getDistance(this.me.getX() , agentXCoords.get(i), this.me.getY() , agentYCoords.get(i));
 					double previousDistance = getDistance(this.me.getX() , agentXCoords.get(i), this.me.getY() , agentYCoords.get(i));
