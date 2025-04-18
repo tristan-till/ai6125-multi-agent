@@ -61,6 +61,10 @@ public class AgentZone {
 	    nextNode = new AgentTile(node.x, currentY);
 	    nodes.add(nextNode);
 	}
+	AgentTile lastNode = nodes.getLast();
+	if (lastNode.y > this.maxY - this.FOV) {
+	    nodes.removeLast();
+	}
 	nextNode = new AgentTile(node.x, this.maxY - this.FOV);
 	nodes.add(nextNode);
 	return nextNode;
@@ -73,6 +77,10 @@ public class AgentZone {
 	    currentX += this.stepSize;
 	    nextNode = new AgentTile(currentX, node.y);
 	    nodes.add(nextNode);
+	}
+	AgentTile lastNode = nodes.getLast();
+	if (lastNode.x > this.maxX - this.FOV) {
+	    nodes.removeLast();
 	}
 	nextNode = new AgentTile(this.maxX - this.FOV, node.y);
 	nodes.add(nextNode);
@@ -87,7 +95,11 @@ public class AgentZone {
 	    nextNode = new AgentTile(currentX, node.y);
 	    nodes.add(nextNode);
 	}
-	nextNode = new AgentTile(this.minX + this.stepSize + this.FOV - 1, node.y);
+	AgentTile lastNode = nodes.getLast();
+	if (lastNode.x < this.minX + 3*this.FOV+1) {
+	    nodes.removeLast();
+	}
+	nextNode = new AgentTile(this.minX + this.stepSize + this.FOV, node.y);
 	nodes.add(nextNode);
 	return nextNode;
     }
@@ -96,13 +108,14 @@ public class AgentZone {
 	AgentTile nextNode = node;
 	int currentY = nextNode.y;
 	int currentX = nextNode.x;
+	boolean goRight = true;
 	while (currentY - this.stepSize > this.minY) {
-	    if (currentX < this.maxX / 2) {
+	    if (goRight) {
 		nextNode = this.goRight(nextNode);
-		
+		goRight = false;
 	    } else {
 		nextNode = this.goLeft(nextNode);
-		
+		goRight = true;
 	    }
 	    nextNode = this.stepUp(nextNode);
 	    currentY = nextNode.y;
